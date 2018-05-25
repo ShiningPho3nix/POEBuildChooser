@@ -4,12 +4,17 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * 
@@ -20,6 +25,80 @@ import java.util.Set;
  *
  */
 public class BuildDatei {
+
+	public void defaultInitializeBuildDatei() throws IOException {
+		System.out.println("Die Aktuelle Build-Datei wird dabei gelöscht. Bitte bestätigen (Y/N)!");
+		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+		boolean noAnswere = true;
+		boolean delete = false;
+
+		while (noAnswere) {
+
+			String another = in.readLine();
+			another = another.toUpperCase();
+
+			switch (another) {
+			case "Y":
+				noAnswere = false;
+				delete = true;
+				break;
+			case "N":
+				noAnswere = false;
+				delete = false;
+				break;
+			case "CANCEL":
+				return;
+			default:
+				System.out.println("Bitte 'Y' oder 'N' eingeben!");
+				break;
+			}
+		}
+
+		if (delete) {
+			HashMap<String, Tuple<String, String>> buildHashMap = new HashMap<String, Tuple<String, String>>();
+			Tuple<String, String> tuple1 = new Tuple<String, String>(
+					"https://www.pathofexile.com/forum/view-thread/1827487", "https://pastebin.com/QS1VB9Vp");
+			buildHashMap.put("Golemancer", tuple1);
+			Tuple<String, String> tuple2 = new Tuple<String, String>(
+					"https://www.pathofexile.com/forum/view-thread/2074126", "https://pastebin.com/Zm5JqGFs");
+			buildHashMap.put("Kintetic Blast", tuple2);
+			Tuple<String, String> tuple3 = new Tuple<String, String>(
+					"https://www.pathofexile.com/forum/view-thread/1971585", "https://pastebin.com/iV5wMmVV");
+			buildHashMap.put("Spectres", tuple3);
+			Tuple<String, String> tuple4 = new Tuple<String, String>(
+					"https://www.pathofexile.com/forum/view-thread/2093326",
+					"Es wurde zu diesem Build kein POB-Pastebin Link angegeben.");
+			buildHashMap.put("Aurabot", tuple4);
+			Tuple<String, String> tuple5 = new Tuple<String, String>(
+					"https://www.pathofexile.com/forum/view-thread/2059332", "https://pastebin.com/DgA2MMsy");
+			buildHashMap.put("Cursebot", tuple5);
+			Tuple<String, String> tuple6 = new Tuple<String, String>(
+					"https://www.pathofexile.com/forum/view-thread/1893911", "https://pastebin.com/BT6G6KNE");
+			buildHashMap.put("Ultrabot", tuple6);
+			Tuple<String, String> tuple7 = new Tuple<String, String>(
+					"https://www.pathofexile.com/forum/view-thread/1730745", "https://pastebin.com/jm9NBFJ4");
+			buildHashMap.put("Pizza-Sticks", tuple7);
+			Tuple<String, String> tuple8 = new Tuple<String, String>(
+					"https://www.pathofexile.com/forum/view-thread/2119881", "https://pastebin.com/RXWzDTLF");
+			buildHashMap.put("Reave Champion", tuple8);
+			Tuple<String, String> tuple9 = new Tuple<String, String>(
+					"https://www.pathofexile.com/forum/view-thread/1846362", "https://pastebin.com/e5etK9i6");
+			buildHashMap.put("Mjölner Discharge", tuple9);
+			Tuple<String, String> tuple10 = new Tuple<String, String>(
+					"https://www.pathofexile.com/forum/view-thread/2050819", "https://pastebin.com/MrC3xH2d");
+			buildHashMap.put("The Poet's Pen Volatile Dead", tuple10);
+
+			PoeBuildChooser.globalBuildArray.buildHashMap = buildHashMap;
+			PoeBuildChooser.globalBuildArray.anzahlBuilds();
+			deleteFile();
+
+			speichern(buildHashMap, new File("POEBuildChooserBuilds.csv"));
+			System.out.println("Eine neue Build Datei wurde erstellt und mit einigen Builds initialisiert."
+					+ " Die Build Datei wurde als POEBuildChooserBuilds.csv gespeichert.");
+		} else {
+			System.out.println("Vorgang abgebrochen");
+		}
+	}
 
 	public void initializeBuildDatei() throws IOException {
 		Tuple<String, String> tuple1 = new Tuple<String, String>(
@@ -98,11 +177,12 @@ public class BuildDatei {
 	}
 
 	public void speichern(HashMap<String, Tuple<String, String>> buildHashMap, File datei) throws IOException {
-
+		TreeMap<String, Tuple<String, String>> sortedBuildHashMap = (TreeMap<String, Tuple<String, String>>) sortMapByKey(
+				buildHashMap);
 		PrintWriter printWriter = new PrintWriter(new FileWriter(datei));
 		Tuple<String, String> forIteration = new Tuple<String, String>("", "");
 		StringBuilder sb = new StringBuilder();
-		Set<String> keys = buildHashMap.keySet();
+		Set<String> keys = sortedBuildHashMap.keySet();
 		String saveBuildName;
 		String saveForumURL;
 		String savePOBURL;
@@ -140,6 +220,12 @@ public class BuildDatei {
 
 	}
 
+	public Map<String, Tuple<String, String>> sortMapByKey(Map<String, Tuple<String, String>> aItems) {
+		TreeMap<String, Tuple<String, String>> result = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+		result.putAll(aItems);
+		return result;
+	}
+
 	/**
 	 * 
 	 */
@@ -147,5 +233,19 @@ public class BuildDatei {
 		Path p = Paths.get("POEBuildChooserBuilds.csv");
 		return Files.notExists(p);
 
+	}
+
+	private void deleteFile() {
+		Path p = Paths.get("POEBuildChooserBuilds.csv");
+		try {
+			Files.deleteIfExists(p);
+		} catch (NoSuchFileException x) {
+			System.err.format("%s: no such" + " file or directory%n", "POEBuildChooserBuilds.csv");
+		} catch (DirectoryNotEmptyException x) {
+			System.err.format("%s not empty%n", "POEBuildChooserBuilds.csv");
+		} catch (IOException x) {
+			// File permission problems are caught here.
+			System.err.println(x);
+		}
 	}
 }

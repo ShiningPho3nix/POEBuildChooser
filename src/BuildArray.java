@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TreeMap;
 
 public class BuildArray {
 
@@ -15,7 +16,6 @@ public class BuildArray {
 	BufferedReader in;
 	String initializeAnswere;
 	public HashMap<String, Tuple<String, String>> buildHashMap;
-	public BuildDatei buildDatei;
 
 	/**
 	 * 
@@ -25,7 +25,6 @@ public class BuildArray {
 		initialize = true;
 		initializeAnswere = null;
 		buildHashMap = new HashMap<String, Tuple<String, String>>();
-		buildDatei = new BuildDatei();
 	}
 
 	/**
@@ -38,18 +37,18 @@ public class BuildArray {
 	 */
 	public void initializeBuildArray() throws IOException {
 		in = new BufferedReader(new InputStreamReader(System.in));
-		if (buildDatei.checkForFileNotExists()) {
+		if (PoeBuildChooser.globalBuildDatei.checkForFileNotExists()) {
 			System.out.println("Build Datei existiert nicht, es wird eine neue Build Datei erzeugt.");
 			System.out.println("Soll die neue Build Datei mit einigen Standardbuilds initialisiert werden (Y/N)?");
 			while (initialize) {
 				initializeAnswere = in.readLine().toUpperCase();
 				switch (initializeAnswere) {
 				case "Y":
-					buildDatei.initializeBuildDatei();
+					PoeBuildChooser.globalBuildDatei.initializeBuildDatei();
 					initialize = false;
 					break;
 				case "N":
-					buildDatei.createFile();
+					PoeBuildChooser.globalBuildDatei.createFile();
 					System.out.println("Build Datei wurde leer erstellt."
 							+ " Die Build Datei wurde als POEBuildChooserBuilds.csv gespeichert.");
 					initialize = false;
@@ -63,7 +62,7 @@ public class BuildArray {
 			}
 		} else {
 			System.out.println("Build Datei gefunden, Builds werden geladen.");
-			buildDatei.dateiEinlesen();
+			PoeBuildChooser.globalBuildDatei.dateiEinlesen();
 		}
 	}
 
@@ -115,6 +114,8 @@ public class BuildArray {
 							inputBuildName = createContinuousName(inputBuildName);
 							exists = false;
 							break;
+						case "CANCEL":
+							return;
 						default:
 							System.out.println("Bitte 'Y' oder 'N' eingeben!");
 							break;
@@ -142,6 +143,9 @@ public class BuildArray {
 						System.out.println(inputBuildURL + " wird als Forums Link dem Build zugeordnet.");
 						tuple.setX(inputBuildURL);
 
+					} else if (in.toString().toUpperCase().equals("CANCEL")) {
+						return;
+
 					} else {
 						System.out.println("Eingabe nicht als gültigen Forums Link erkannt.");
 						continue;
@@ -164,6 +168,9 @@ public class BuildArray {
 						System.out.println(inputPOBURL + " wird als POB-Pastebin Link dem Build zugeordnet.");
 						tuple.setY(inputPOBURL);
 
+					} else if (in.toString().toUpperCase().equals("CANCEL")) {
+						return;
+
 					} else {
 						System.out.println("Eingabe nicht als gültigen POB-Pastebin Link erkannt.");
 						continue;
@@ -171,7 +178,9 @@ public class BuildArray {
 				}
 				buildHashMap.put(inputBuildName, tuple);
 				buildAnzahl = anzahlBuilds();
-				buildDatei.speichern(buildHashMap, new File("POEBuildChooserBuilds.csv"));
+				PoeBuildChooser.globalBuildDatei.speichern(buildHashMap, new File("POEBuildChooserBuilds.csv"));
+			} else if (in.toString().toUpperCase().equals("CANCEL")) {
+				return;
 			} else {
 				System.out.println("Build Name darf nicht leer sein und darf kein ',' enthalten.");
 			}
@@ -188,6 +197,8 @@ public class BuildArray {
 					noAnswere = false;
 					anotherOne = false;
 					break;
+				case "CANCEL":
+					return;
 				default:
 					System.out.println("Bitte 'Y' oder 'N' eingeben!");
 					break;
@@ -195,6 +206,59 @@ public class BuildArray {
 				}
 			}
 
+		}
+	}
+
+	public void deleteBuild() throws IOException {
+		Boolean unclear = true;
+		Boolean noAnswere = true;
+
+		while (unclear) {
+			System.out.println("Zu löschenden Buildnamen eingeben:");
+			String buildName = in.readLine();
+			Boolean buildExists = false;
+
+			if (buildName.equals("") || buildName.equals(null)) {
+				System.out.println("Eingabe darf nicht leer sein");
+				continue;
+			}
+
+			buildExists = PoeBuildChooser.globalBuildArray.buildHashMap.containsKey(buildName);
+			if (buildExists) {
+				PoeBuildChooser.globalBuildArray.buildHashMap.remove(buildName);
+				PoeBuildChooser.globalBuildDatei.speichern(buildHashMap, new File("POEBuildChooserBuilds.csv"));
+				System.out.println("Löschen des Builds " + buildName + " war erfolgreich");
+				unclear = false;
+				break;
+			} else {
+				System.out.println(
+						"Diesen Buildnamen scheint es nicht zu geben. " + "Bitte den exakten Buildnamen eingeben. "
+								+ "Gegebenenfalls mit 'list' eine Liste aller Builds ausgeben lassen.");
+			}
+		}
+
+		System.out.println("Soll ein weiterer Build gelöscht werden (Y/N)?");
+		noAnswere = true;
+		while (noAnswere) {
+			String another = in.readLine();
+			another = another.toUpperCase();
+
+			switch (another) {
+			case "Y":
+				noAnswere = false;
+				unclear = true;
+				break;
+			case "N":
+				noAnswere = false;
+				unclear = false;
+				break;
+			case "CANCEL":
+				return;
+			default:
+				System.out.println("Bitte 'Y' oder 'N' eingeben!");
+				break;
+
+			}
 		}
 	}
 
@@ -221,6 +285,18 @@ public class BuildArray {
 		return buildName;
 	}
 
+	public void list() {
+		TreeMap<String, Tuple<String, String>> sortedBuildHashMap = (TreeMap<String, Tuple<String, String>>) PoeBuildChooser.globalBuildDatei
+				.sortMapByKey(buildHashMap);
+		Collection<String> buildCollection = sortedBuildHashMap.keySet();
+		List<String> buildList = new ArrayList<>(buildCollection);
+		System.out.println("Die derzeitigen Builds sind:");
+		for (Iterator<String> iterator = buildList.iterator(); iterator.hasNext();) {
+			String string = iterator.next();
+			System.out.println(string);
+		}
+	}
+
 	public int anzahlBuilds() {
 		buildAnzahl = buildHashMap.size();
 		return buildAnzahl;
@@ -238,4 +314,5 @@ public class BuildArray {
 		Tuple<String, String> tuple = new Tuple<String, String>(forum, pob);
 		buildHashMap.put(buildname, tuple);
 	}
+
 }
