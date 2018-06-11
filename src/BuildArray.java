@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 public class BuildArray {
@@ -50,7 +51,7 @@ public class BuildArray {
 				case "N":
 					PoeBuildChooser.globalBuildDatei.createFile();
 					System.out.println("Build Datei wurde leer erstellt."
-							+ " Die Build Datei wurde als POEBuildChooserBuilds.csv gespeichert.");
+							+ " Die Build Datei wurde als 'Default - POEBuildChooserBuilds.csv' gespeichert.");
 					initialize = false;
 					break;
 				default:
@@ -178,7 +179,7 @@ public class BuildArray {
 				}
 				buildHashMap.put(inputBuildName, tuple);
 				buildAnzahl = anzahlBuilds();
-				PoeBuildChooser.globalBuildDatei.speichern(buildHashMap, new File("POEBuildChooserBuilds.csv"));
+				PoeBuildChooser.globalBuildDatei.speichern(buildHashMap, new File(BuildDatei.files.get(PoeBuildChooser.buildDateiId - 1).toString()));
 			} else if (in.toString().toUpperCase().equals("CANCEL")) {
 				return;
 			} else {
@@ -226,7 +227,7 @@ public class BuildArray {
 			buildExists = PoeBuildChooser.globalBuildArray.buildHashMap.containsKey(buildName);
 			if (buildExists) {
 				PoeBuildChooser.globalBuildArray.buildHashMap.remove(buildName);
-				PoeBuildChooser.globalBuildDatei.speichern(buildHashMap, new File("POEBuildChooserBuilds.csv"));
+				PoeBuildChooser.globalBuildDatei.speichern(buildHashMap, new File(BuildDatei.files.get(PoeBuildChooser.buildDateiId - 1).toString()));
 				System.out.println("Löschen des Builds " + buildName + " war erfolgreich");
 				unclear = false;
 				break;
@@ -286,7 +287,7 @@ public class BuildArray {
 	}
 
 	public void list() {
-		TreeMap<String, Tuple<String, String>> sortedBuildHashMap = (TreeMap<String, Tuple<String, String>>) PoeBuildChooser.globalBuildDatei
+		TreeMap<String, Tuple<String, String>> sortedBuildHashMap = (TreeMap<String, Tuple<String, String>>) PoeBuildChooser.globalBuildArray
 				.sortMapByKey(buildHashMap);
 		Collection<String> buildCollection = sortedBuildHashMap.keySet();
 		List<String> buildList = new ArrayList<>(buildCollection);
@@ -295,6 +296,13 @@ public class BuildArray {
 			String string = iterator.next();
 			System.out.println(string);
 		}
+		System.out.println("");
+	}
+	
+	public Map<String, Tuple<String, String>> sortMapByKey(Map<String, Tuple<String, String>> aItems) {
+		TreeMap<String, Tuple<String, String>> result = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+		result.putAll(aItems);
+		return result;
 	}
 
 	public int anzahlBuilds() {

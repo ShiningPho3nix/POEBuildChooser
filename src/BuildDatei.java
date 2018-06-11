@@ -11,8 +11,9 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -26,8 +27,12 @@ import java.util.TreeMap;
  */
 public class BuildDatei {
 
-	public void defaultInitializeBuildDatei() throws IOException {
-		System.out.println("Die Aktuelle Build-Datei wird dabei gelöscht. Bitte bestätigen (Y/N)!");
+	static List<File> files = new ArrayList<File>();
+	int anzahlFiles = 0;
+
+	public void resetBuildDatei() throws IOException {
+		System.out.println(
+				"Die Aktuelle Build-Datei wird dabei gelöscht und durch eine neue Leere oder Standard inizialisierte Datei ersetzt. Bitte bestätigen (Y/N)!");
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		boolean noAnswere = true;
 		boolean delete = false;
@@ -90,11 +95,12 @@ public class BuildDatei {
 
 			PoeBuildChooser.globalBuildArray.buildHashMap = buildHashMap;
 			PoeBuildChooser.globalBuildArray.anzahlBuilds();
-			deleteFile();
+			deleteFile(PoeBuildChooser.buildDateiId);
 
-			speichern(buildHashMap, new File("POEBuildChooserBuilds.csv"));
-			System.out.println("Eine neue Build Datei wurde erstellt und mit einigen Builds initialisiert."
-					+ " Die Build Datei wurde als POEBuildChooserBuilds.csv gespeichert.");
+			speichern(buildHashMap, new File(files.get(PoeBuildChooser.buildDateiId - 1).toString()));
+			System.out.println(
+					"Build Datei wurde erstellt und mit einigen Builds initialisiert." + " Die Build Datei wurde unter "
+							+ files.get(PoeBuildChooser.buildDateiId - 1).toString() + " gespeichert.");
 		} else {
 			System.out.println("Vorgang abgebrochen");
 		}
@@ -133,39 +139,88 @@ public class BuildDatei {
 				"https://www.pathofexile.com/forum/view-thread/2050819", "https://pastebin.com/MrC3xH2d");
 		PoeBuildChooser.globalBuildArray.buildHashMap.put("The Poet's Pen Volatile Dead", tuple10);
 		PoeBuildChooser.globalBuildArray.anzahlBuilds();
-		speichern(PoeBuildChooser.globalBuildArray.buildHashMap, new File("POEBuildChooserBuilds.csv"));
-		System.out.println("Build Datei wurde erstellt und mit einigen Builds initialisiert."
-				+ " Die Build Datei wurde als POEBuildChooserBuilds.csv gespeichert.");
+		speichern(PoeBuildChooser.globalBuildArray.buildHashMap,
+				new File(files.get(PoeBuildChooser.buildDateiId - 1).toString()));
+		System.out.println(
+				"Build Datei wurde erstellt und mit einigen Builds initialisiert." + " Die Build Datei wurde unter "
+						+ files.get(PoeBuildChooser.buildDateiId - 1).toString() + " gespeichert.");
 	}
 
 	public void dateiEinlesen() throws IOException {
+		int antwort = 0;
 		try {
-			BufferedReader buildDatei = new BufferedReader(new FileReader("POEBuildChooserBuilds.csv"));
-			String line = buildDatei.readLine();
-			int buildAnzahl;
-			if (line == null) {
-				buildDatei.close();
-				buildAnzahl = PoeBuildChooser.globalBuildArray.anzahlBuilds();
-				System.out.println("Es wurden " + buildAnzahl + " Builds aus der Build Datei geladen");
-			} else {
-				String build;
-				String forum;
-				String pob;
-				String[] parts;
+			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
-				while (line != null) {
-					parts = line.split(",");
-					build = parts[0];
-					forum = parts[1];
-					pob = parts[2];
-					Tuple<String, String> tupleread = new Tuple<String, String>(forum, pob);
-					PoeBuildChooser.globalBuildArray.buildHashMap.put(build, tupleread);
-					line = buildDatei.readLine();
+			File dir = new File(currentDirectory());
+			File[] allFiles = dir.listFiles();
+
+			for (File file : allFiles) {
+				if (accept(file)) {
+					files.add(file);
 				}
-				buildDatei.close();
-				buildAnzahl = PoeBuildChooser.globalBuildArray.anzahlBuilds();
-				System.out.println("");
-				System.out.println("Es wurden " + buildAnzahl + " Builds aus der Build Datei geladen");
+			}
+
+			anzahlFiles = files.size();
+			if (anzahlFiles > 1) {
+				System.out.println("Es wurden mehrere Build Dateien gefunden:");
+				for (int i = 0; i < anzahlFiles; i++) {
+					int counter = i + 1;
+					System.out.println(String.valueOf(counter) + ": " + files.get(i));
+				}
+				boolean chooseFile = true;
+				while (chooseFile) {
+					boolean keineZahlEingegeben = false;
+					System.out.println(
+							"Nummer der zu ladenen Datei eingeben ('0' Eingeben um eine neue Datei zu erzeugen):");
+					String input = in.readLine();
+					char[] charArray = input.toCharArray();
+					for (char c : charArray) {
+						if (!Character.isDigit(c)) {
+							System.out
+									.println("Bitte nur Zahlen eingeben, keine Buchstaben, Leer- oder Sonderzeichen.");
+							keineZahlEingegeben = true;
+							break;
+						} else {
+							continue;
+						}
+					}
+					if (keineZahlEingegeben) {
+						continue;
+					} else if (antwort == 0) {
+						System.out.println("Bitte einen Namen für die Datei eingeben:");
+						String buildName = in.readLine();
+						HashMap<String, Tuple<String, String>> buildHashMap = new HashMap<String, Tuple<String, String>>();
+						PoeBuildChooser.globalBuildArray.buildHashMap = buildHashMap;
+						PoeBuildChooser.globalBuildArray.anzahlBuilds();
+						speichern(PoeBuildChooser.globalBuildArray.buildHashMap,
+								new File(buildName + " - POEBuildChooserBuilds.csv"));
+						System.out.println(
+								"Build Datei wurde erstellt und mit einigen Builds initialisiert. Die Build Datei wurde als "
+										+ buildName + " - POEBuildChooserBuilds.csv gespeichert.");
+						// TODO ID-Funktion Implementieren, sodass jede
+						// BuildDatei eine eindeutige Id bekommt. Eventuell Id
+						// mit in die Datei aufnehmen und bei Laden entsprechend
+						// abfangen
+						// PoeBuildChooser.buildDateiId =
+						return;
+					} else {
+						antwort = Integer.parseInt(input);
+						readFiles(antwort);
+					}
+
+					chooseFile = false;
+					if (antwort > anzahlFiles) {
+						System.out.println("Unzugeordnete Zahl eingegeben");
+						chooseFile = true;
+						continue;
+					}
+				}
+			} else if (anzahlFiles == 0) {
+				System.out.println(
+						"Es wurden keine Gültigen Build Dateien gefunden. Es wird eine neue Build Datei erzeugt und geladen.");
+				initializeBuildDatei();
+			} else {
+				readFiles(1);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -177,8 +232,8 @@ public class BuildDatei {
 	}
 
 	public void speichern(HashMap<String, Tuple<String, String>> buildHashMap, File datei) throws IOException {
-		TreeMap<String, Tuple<String, String>> sortedBuildHashMap = (TreeMap<String, Tuple<String, String>>) sortMapByKey(
-				buildHashMap);
+		TreeMap<String, Tuple<String, String>> sortedBuildHashMap = (TreeMap<String, Tuple<String, String>>) PoeBuildChooser.globalBuildArray
+				.sortMapByKey(buildHashMap);
 		PrintWriter printWriter = new PrintWriter(new FileWriter(datei));
 		Tuple<String, String> forIteration = new Tuple<String, String>("", "");
 		StringBuilder sb = new StringBuilder();
@@ -215,28 +270,62 @@ public class BuildDatei {
 	 * 
 	 */
 	public void createFile() throws IOException {
-		File f = new File("POEBuildChooserBuilds.csv");
+		File f = new File("Default - POEBuildChooserBuilds.csv");
 		f.createNewFile();
-
-	}
-
-	public Map<String, Tuple<String, String>> sortMapByKey(Map<String, Tuple<String, String>> aItems) {
-		TreeMap<String, Tuple<String, String>> result = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-		result.putAll(aItems);
-		return result;
 	}
 
 	/**
 	 * 
 	 */
-	public Boolean checkForFileNotExists() {
-		Path p = Paths.get("POEBuildChooserBuilds.csv");
-		return Files.notExists(p);
-
+	public boolean checkForFileNotExists() {
+		File dir = new File(currentDirectory());
+		return accept(dir);
 	}
 
-	private void deleteFile() {
-		Path p = Paths.get("POEBuildChooserBuilds.csv");
+	public boolean accept(File file) {
+		String zuTesten = file.getName();
+		Boolean contains = zuTesten.endsWith(" - POEBuildChooserBuilds.csv");
+		return contains;
+	}
+
+	public void readFiles(int fileNumber) throws IOException {
+		int buildAnzahl = 0;
+		String gewaehlteDatei = files.get(fileNumber - 1).toString();
+		BufferedReader buildDatei = new BufferedReader(new FileReader(gewaehlteDatei));
+		String line = buildDatei.readLine();
+
+		if (line == null) {
+			buildDatei.close();
+			buildAnzahl = PoeBuildChooser.globalBuildArray.anzahlBuilds();
+			System.out.println(
+					"Es wurden " + buildAnzahl + " Builds aus der Build Datei: " + gewaehlteDatei + " geladen");
+		} else {
+			String build;
+			String forum;
+			String pob;
+			String[] parts;
+
+			while (line != null) {
+				parts = line.split(",");
+				build = parts[0];
+				forum = parts[1];
+				pob = parts[2];
+				Tuple<String, String> tupleread = new Tuple<String, String>(forum, pob);
+				PoeBuildChooser.globalBuildArray.buildHashMap.put(build, tupleread);
+				line = buildDatei.readLine();
+			}
+			buildDatei.close();
+			buildAnzahl = PoeBuildChooser.globalBuildArray.anzahlBuilds();
+			System.out.println("");
+			System.out.println(
+					"Es wurden " + buildAnzahl + " Builds aus der Build Datei: " + gewaehlteDatei + " geladen");
+		}
+		PoeBuildChooser.buildDateiId = fileNumber;
+	}
+
+	
+	private void deleteFile(int fileId) {
+		Path p = Paths.get(files.get(fileId - 1).toString());
 		try {
 			Files.deleteIfExists(p);
 		} catch (NoSuchFileException x) {
@@ -244,8 +333,12 @@ public class BuildDatei {
 		} catch (DirectoryNotEmptyException x) {
 			System.err.format("%s not empty%n", "POEBuildChooserBuilds.csv");
 		} catch (IOException x) {
-			// File permission problems are caught here.
 			System.err.println(x);
 		}
+	}
+
+	public String currentDirectory() {
+		Path currentRelativePath = Paths.get("");
+		return currentRelativePath.toAbsolutePath().toString();
 	}
 }

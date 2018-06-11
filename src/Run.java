@@ -35,7 +35,7 @@ public class Run {
 				PoeBuildChooser.globalChooser.chooseBuild();
 				break;
 			case "initialize":
-				PoeBuildChooser.globalBuildDatei.defaultInitializeBuildDatei();
+				PoeBuildChooser.globalBuildDatei.resetBuildDatei();
 				break;
 			case "list":
 				PoeBuildChooser.globalBuildArray.list();
