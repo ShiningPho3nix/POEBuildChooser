@@ -27,6 +27,10 @@ import java.util.TreeMap;
  */
 public class BuildDatei {
 
+	// TODO Grundtunktionalität ist wieder hergestellt, als nächstes Code aufräumen
+	// und von HashMap<String, Tuple<String, String>> auf Build Objekte wechseln.
+	// Danach für mehrere Dateien erweitern.
+
 	static List<File> files = new ArrayList<File>();
 	int anzahlFiles = 0;
 
@@ -96,7 +100,7 @@ public class BuildDatei {
 			PoeBuildChooser.globalBuildArray.buildHashMap = buildHashMap;
 			PoeBuildChooser.globalBuildArray.anzahlBuilds();
 			deleteFile(PoeBuildChooser.buildDateiId);
-
+			// TODO .csv Datei durch Datenbank ersetzen
 			speichern(buildHashMap, new File(files.get(PoeBuildChooser.buildDateiId - 1).toString()));
 			System.out.println(
 					"Build Datei wurde erstellt und mit einigen Builds initialisiert." + " Die Build Datei wurde unter "
@@ -139,11 +143,9 @@ public class BuildDatei {
 				"https://www.pathofexile.com/forum/view-thread/2050819", "https://pastebin.com/MrC3xH2d");
 		PoeBuildChooser.globalBuildArray.buildHashMap.put("The Poet's Pen Volatile Dead", tuple10);
 		PoeBuildChooser.globalBuildArray.anzahlBuilds();
-		speichern(PoeBuildChooser.globalBuildArray.buildHashMap,
-				new File(files.get(PoeBuildChooser.buildDateiId - 1).toString()));
-		System.out.println(
-				"Build Datei wurde erstellt und mit einigen Builds initialisiert." + " Die Build Datei wurde unter "
-						+ files.get(PoeBuildChooser.buildDateiId - 1).toString() + " gespeichert.");
+		speichern(PoeBuildChooser.globalBuildArray.buildHashMap, new File("New File - POEBuildChooserBuilds.csv"));
+		System.out.println("Build Datei wurde erstellt und mit einigen Builds initialisiert. "
+				+ "Die Build Datei wurde unter New File - POEBuildChooserBuilds.csv gespeichert.");
 	}
 
 	public void dateiEinlesen() throws IOException {
@@ -197,11 +199,7 @@ public class BuildDatei {
 						System.out.println(
 								"Build Datei wurde erstellt und mit einigen Builds initialisiert. Die Build Datei wurde als "
 										+ buildName + " - POEBuildChooserBuilds.csv gespeichert.");
-						// TODO ID-Funktion Implementieren, sodass jede
-						// BuildDatei eine eindeutige Id bekommt. Eventuell Id
-						// mit in die Datei aufnehmen und bei Laden entsprechend
-						// abfangen
-						// PoeBuildChooser.buildDateiId =
+
 						return;
 					} else {
 						antwort = Integer.parseInt(input);
@@ -323,7 +321,6 @@ public class BuildDatei {
 		PoeBuildChooser.buildDateiId = fileNumber;
 	}
 
-	
 	private void deleteFile(int fileId) {
 		Path p = Paths.get(files.get(fileId - 1).toString());
 		try {

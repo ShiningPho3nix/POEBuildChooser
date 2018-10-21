@@ -21,8 +21,6 @@ public class PoeBuildChooser {
 		
 		// TODO hinzufügen einer copy funktion für die datei, wenn man etwas
 		// testen will etc.
-		// eventuell dann auch gleich eine Funktion hinzufügen, die es
-		// ermöglicht mehrere Build-Dateien zu haben und davon eine zu laden.
-
+		
 	}
 }
