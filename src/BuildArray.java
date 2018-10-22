@@ -38,10 +38,10 @@ public class BuildArray {
 
 	/**
 	 * 
-	 * @throws IOException Initialisiert das Array mit den Builds. Existiert bisher
-	 *                     keine Build Datei, so wird eine neue erzeugt. Auf Wunsch
-	 *                     des Users entweder mit einigen Builds oder komplett leer.
-	 *                     Existiert eine Datei werden diese in das Array geladen.
+	 * @throws IOException Initialisiert die Map mit den Builds, welche aus einer
+	 *                     Datei eingelesen werden. Existiert bisher keine Build
+	 *                     Datei, so wird eine neue erzeugt. Auf Wunsch des Users
+	 *                     entweder mit einigen Builds oder komplett leer.
 	 */
 	public void initializeBuildArray() throws IOException {
 		in = new BufferedReader(new InputStreamReader(System.in));
@@ -75,8 +75,8 @@ public class BuildArray {
 	}
 
 	/**
-	 * Ermöglicht das hinzufügen von einem oder mehreren Builds zu dem aktuellen
-	 * Array. Das Array wird anschließend in der Aktuellen Datei gespeichert.
+	 * Ermöglicht das hinzufügen von einem oder mehreren Builds zu der aktuellen
+	 * Map. Die Map wird anschließend in der Aktuellen Datei gespeichert.
 	 * 
 	 * @throws IOException
 	 */

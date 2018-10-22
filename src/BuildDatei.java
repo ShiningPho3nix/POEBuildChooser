@@ -167,7 +167,7 @@ public class BuildDatei {
 
 	/**
 	 * Liest alle Build Dateien (Dateien mit dem Suffix '-
-	 * POEBuildChooserBuilds.csv') ein und bereitet daraus das Array mit den Builds
+	 * POEBuildChooserBuilds.csv') ein und bereitet daraus die Map mit den Builds
 	 * vor.
 	 * 
 	 * @throws IOException
@@ -256,8 +256,8 @@ public class BuildDatei {
 	}
 
 	/**
-	 * Speichert das Aktuelle Build-Array in der Datei ab. Später, wenn korrekt mit
-	 * mehreren Dateien umgegangen werden kann, wird das Array in der aktuell
+	 * Speichert die aktuelle Map in der Datei ab. Später, wenn korrekt mit
+	 * mehreren Dateien umgegangen werden kann, wird die Map in der aktuell
 	 * gewählten Datei gespeichert.
 	 * 
 	 * @param buildHashMap
@@ -265,7 +265,7 @@ public class BuildDatei {
 	 * @throws IOException
 	 */
 	public void speichern(HashMap<String, Tuple<String, String>> buildHashMap, File datei) throws IOException {
-		// TODO Für den Umgang mit mehreren DAteien sollte hier noch hinzugefügt werden
+		// TODO Für den Umgang mit mehreren Dateien sollte hier noch hinzugefügt werden
 		// das der Nutzer eine Datei wählen kann in der er speichern möchte.
 		TreeMap<String, Tuple<String, String>> sortedBuildHashMap = (TreeMap<String, Tuple<String, String>>) PoeBuildChooser.globalBuildArray
 				.sortMapByKey(buildHashMap);
@@ -333,7 +333,7 @@ public class BuildDatei {
 	}
 	
 	/**
-	 * Liest die Dateien ein, teilt die Einträge auf und füllt damit die Tupel und das Array.
+	 * Liest die Dateien ein, teilt die Einträge auf und füllt damit die Tupel und die Map.
 	 * @param fileNumber
 	 * @throws IOException
 	 */
