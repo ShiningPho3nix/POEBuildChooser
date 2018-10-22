@@ -7,13 +7,19 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Klasse ist für die auswahl eines zufälligen Buildes zuständig.
+ * 
+ * @author Steffen Dworsky
+ *
+ */
 public class Choose {
 
 	public String build;
 	private int localbuildAnzahl;
 
 	/**
-	 * @return gibt einen zufällig ausgewählten Build asl String zurück.
+	 * @return Gibt einen zufällig ausgewählten Build auf der Konsole aus.
 	 * @throws URISyntaxException
 	 * @throws IOException
 	 */

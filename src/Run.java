@@ -10,9 +10,17 @@ import java.net.URISyntaxException;
 /**
  * @author Steffen Dworsky
  *
+ *         Wird bei Programmstart gestartet. Ist zuständig für die Verarbeitung
+ *         von Usereingaben.
  */
 public class Run {
 
+	/**
+	 * Methode nimmt Usereingaben an und verarbeitet diese.
+	 * 
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
 	public void runProgram() throws IOException, URISyntaxException {
 		PoeBuildChooser.globalBuildArray.initializeBuildArray();
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
@@ -34,7 +42,7 @@ public class Run {
 			case "choose":
 				PoeBuildChooser.globalChooser.chooseBuild();
 				break;
-			case "initialize":
+			case "reset":
 				PoeBuildChooser.globalBuildDatei.resetBuildDatei();
 				break;
 			case "list":
@@ -47,7 +55,8 @@ public class Run {
 				break;
 			case "h":
 				System.out.println("'h' oder 'help': Gibt diese Liste mit Befehlen aus.");
-				System.out.println("'initialize': Löscht die Build-Datei und erstellt eine neue mit 10 Standardbuilds");
+				System.out.println(
+						"'reset': Löscht die Build-Datei und erstellt eine neue leere Datei oder eine neue mit 10 Standardbuilds.");
 				System.out.println("'addbuild': Ermöglicht das hinzufügen und abspeichern eines neuen Builds.");
 				System.out.println("'delete': Ermöglicht das Löschen eines Buildes.");
 				System.out.println("'list': Gibt eine Liste mit allen Builds aus.");
@@ -57,7 +66,8 @@ public class Run {
 				break;
 			case "help":
 				System.out.println("'h' oder 'help': Gibt diese Liste mit Befehlen aus.");
-				System.out.println("'initialize': Löscht die Build-Datei und erstellt eine neue mit 10 Standardbuilds");
+				System.out.println(
+						"'reset': Löscht die Build-Datei und erstellt eine neue leere Datei oder eine neue mit 10 Standardbuilds.");
 				System.out.println("'addbuild': Ermöglicht das hinzufügen und abspeichern eines neuen Builds.");
 				System.out.println("'delete': Ermöglicht das Löschen eines Buildes.");
 				System.out.println("'list': Gibt eine Liste mit allen Builds aus.");

@@ -23,17 +23,26 @@ import java.util.TreeMap;
 
 /**
  * @author Steffen Dworsky
+ * 
+ *         Enthält alle Funktionen zum Abspeichern und bearbeiten der
+ *         Build-Dateien
  *
  */
 public class BuildDatei {
 
-	// TODO Grundtunktionalität ist wieder hergestellt, als nächstes Code aufräumen
-	// und von HashMap<String, Tuple<String, String>> auf Build Objekte wechseln.
-	// Danach für mehrere Dateien erweitern.
+	// TODO Code aufräumen, von HashMap<String, Tuple<String, String>> auf Build
+	// Objekte wechseln.
+	// TODO Danach für mehrere Dateien erweitern.
 
 	static List<File> files = new ArrayList<File>();
 	int anzahlFiles = 0;
 
+	/**
+	 * Setzt die Aktuell gewählte Build Datei entweder auf die standard
+	 * Build-Auswahl zurück oder leert die Datei komplett.
+	 * 
+	 * @throws IOException
+	 */
 	public void resetBuildDatei() throws IOException {
 		System.out.println(
 				"Die Aktuelle Build-Datei wird dabei gelöscht und durch eine neue Leere oder Standard inizialisierte Datei ersetzt. Bitte bestätigen (Y/N)!");
@@ -110,7 +119,15 @@ public class BuildDatei {
 		}
 	}
 
+	/**
+	 * Inizialisiert eine Standard Datei, falls ervorderlich (z.B. wenn noch keine
+	 * Build Datei existiert.
+	 * 
+	 * @throws IOException
+	 */
 	public void initializeBuildDatei() throws IOException {
+		// TODO soll später, durch eine extra Funktion übernommen werden, die hier dann
+		// einfach aufgerufen wird. Ebenso bei resetBuildDatei (Codeminimierung)
 		Tuple<String, String> tuple1 = new Tuple<String, String>(
 				"https://www.pathofexile.com/forum/view-thread/1827487", "https://pastebin.com/QS1VB9Vp");
 		PoeBuildChooser.globalBuildArray.buildHashMap.put("Golemancer", tuple1);
@@ -143,11 +160,18 @@ public class BuildDatei {
 				"https://www.pathofexile.com/forum/view-thread/2050819", "https://pastebin.com/MrC3xH2d");
 		PoeBuildChooser.globalBuildArray.buildHashMap.put("The Poet's Pen Volatile Dead", tuple10);
 		PoeBuildChooser.globalBuildArray.anzahlBuilds();
-		speichern(PoeBuildChooser.globalBuildArray.buildHashMap, new File("New File - POEBuildChooserBuilds.csv"));
+		speichern(PoeBuildChooser.globalBuildArray.buildHashMap, new File("Default - POEBuildChooserBuilds.csv"));
 		System.out.println("Build Datei wurde erstellt und mit einigen Builds initialisiert. "
 				+ "Die Build Datei wurde unter New File - POEBuildChooserBuilds.csv gespeichert.");
 	}
 
+	/**
+	 * Liest alle Build Dateien (Dateien mit dem Suffix '-
+	 * POEBuildChooserBuilds.csv') ein und bereitet daraus das Array mit den Builds
+	 * vor.
+	 * 
+	 * @throws IOException
+	 */
 	public void dateiEinlesen() throws IOException {
 		int antwort = 0;
 		try {
@@ -189,6 +213,8 @@ public class BuildDatei {
 					if (keineZahlEingegeben) {
 						continue;
 					} else if (antwort == 0) {
+						// TODO als extra Funktion die erstellung einer Build-Datei anbieten, nicht
+						// unter dieser Funktion
 						System.out.println("Bitte einen Namen für die Datei eingeben:");
 						String buildName = in.readLine();
 						HashMap<String, Tuple<String, String>> buildHashMap = new HashMap<String, Tuple<String, String>>();
@@ -216,7 +242,7 @@ public class BuildDatei {
 			} else if (anzahlFiles == 0) {
 				System.out.println(
 						"Es wurden keine Gültigen Build Dateien gefunden. Es wird eine neue Build Datei erzeugt und geladen.");
-				initializeBuildDatei();
+				createFile();
 			} else {
 				readFiles(1);
 			}
@@ -229,7 +255,18 @@ public class BuildDatei {
 		}
 	}
 
+	/**
+	 * Speichert das Aktuelle Build-Array in der Datei ab. Später, wenn korrekt mit
+	 * mehreren Dateien umgegangen werden kann, wird das Array in der aktuell
+	 * gewählten Datei gespeichert.
+	 * 
+	 * @param buildHashMap
+	 * @param datei
+	 * @throws IOException
+	 */
 	public void speichern(HashMap<String, Tuple<String, String>> buildHashMap, File datei) throws IOException {
+		// TODO Für den Umgang mit mehreren DAteien sollte hier noch hinzugefügt werden
+		// das der Nutzer eine Datei wählen kann in der er speichern möchte.
 		TreeMap<String, Tuple<String, String>> sortedBuildHashMap = (TreeMap<String, Tuple<String, String>>) PoeBuildChooser.globalBuildArray
 				.sortMapByKey(buildHashMap);
 		PrintWriter printWriter = new PrintWriter(new FileWriter(datei));
@@ -264,8 +301,10 @@ public class BuildDatei {
 	}
 
 	/**
-	 * @throws IOException
+	 * Erstellt eine neue leere Datei mit dem Namen 'Default -
+	 * POEBuildChooserBuilds.csv'.
 	 * 
+	 * @throws IOException
 	 */
 	public void createFile() throws IOException {
 		File f = new File("Default - POEBuildChooserBuilds.csv");
@@ -273,19 +312,31 @@ public class BuildDatei {
 	}
 
 	/**
-	 * 
+	 * Checkt ob es Dateien gibt, bzw. eher ob es keine gibt.
 	 */
 	public boolean checkForFileNotExists() {
 		File dir = new File(currentDirectory());
 		return accept(dir);
 	}
 
+	/**
+	 * Prüft ob die übergebene Datei den Suffix für Build Dateien hat (' -
+	 * POEBuildChooserBuilds.csv').
+	 * 
+	 * @param file
+	 * @return true, wenn die Datei den gewünschten Suffix hat.
+	 */
 	public boolean accept(File file) {
 		String zuTesten = file.getName();
 		Boolean contains = zuTesten.endsWith(" - POEBuildChooserBuilds.csv");
 		return contains;
 	}
-
+	
+	/**
+	 * Liest die Dateien ein, teilt die Einträge auf und füllt damit die Tupel und das Array.
+	 * @param fileNumber
+	 * @throws IOException
+	 */
 	public void readFiles(int fileNumber) throws IOException {
 		int buildAnzahl = 0;
 		String gewaehlteDatei = files.get(fileNumber - 1).toString();
@@ -321,6 +372,11 @@ public class BuildDatei {
 		PoeBuildChooser.buildDateiId = fileNumber;
 	}
 
+	/**
+	 * Ermöglicht es eine gewählte Datei zu löschen.
+	 * 
+	 * @param fileId
+	 */
 	private void deleteFile(int fileId) {
 		Path p = Paths.get(files.get(fileId - 1).toString());
 		try {
@@ -334,6 +390,9 @@ public class BuildDatei {
 		}
 	}
 
+	/**
+	 * @return Gibt das aktuelle Verzeichniss zurück.
+	 */
 	public String currentDirectory() {
 		Path currentRelativePath = Paths.get("");
 		return currentRelativePath.toAbsolutePath().toString();

@@ -1,18 +1,16 @@
-/**
- * 
- */
 
 /**
- * @author Steffen Dworsky
  * Simple Klasse zum Abspeichern von Tupeln.
- *
+ * 
+ * @author Steffen Dworsky
  */
 public class Tuple<X, Y> {
 	public String x;
 	public String y;
-	
+
 	/**
-	 * Constuctor
+	 * Constuctor, der einen neuen Tupel erzeugt.
+	 * 
 	 * @param x
 	 * @param y
 	 */
@@ -20,7 +18,7 @@ public class Tuple<X, Y> {
 		this.x = x;
 		this.y = y;
 	}
-	
+
 	/**
 	 * @param setzt den ersten Wert im Tuple auf String x
 	 */
@@ -49,5 +47,4 @@ public class Tuple<X, Y> {
 		return y;
 	}
 
-	
 }
