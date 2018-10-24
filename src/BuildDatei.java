@@ -12,10 +12,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeMap;
 
 /**
  * 
@@ -73,44 +70,13 @@ public class BuildDatei {
 		}
 
 		if (delete) {
-			HashMap<String, Tuple<String, String>> buildHashMap = new HashMap<String, Tuple<String, String>>();
-			Tuple<String, String> tuple1 = new Tuple<String, String>(
-					"https://www.pathofexile.com/forum/view-thread/1827487", "https://pastebin.com/QS1VB9Vp");
-			buildHashMap.put("Golemancer", tuple1);
-			Tuple<String, String> tuple2 = new Tuple<String, String>(
-					"https://www.pathofexile.com/forum/view-thread/2074126", "https://pastebin.com/Zm5JqGFs");
-			buildHashMap.put("Kintetic Blast", tuple2);
-			Tuple<String, String> tuple3 = new Tuple<String, String>(
-					"https://www.pathofexile.com/forum/view-thread/1971585", "https://pastebin.com/iV5wMmVV");
-			buildHashMap.put("Spectres", tuple3);
-			Tuple<String, String> tuple4 = new Tuple<String, String>(
-					"https://www.pathofexile.com/forum/view-thread/2093326",
-					"Es wurde zu diesem Build kein POB-Pastebin Link angegeben.");
-			buildHashMap.put("Aurabot", tuple4);
-			Tuple<String, String> tuple5 = new Tuple<String, String>(
-					"https://www.pathofexile.com/forum/view-thread/2059332", "https://pastebin.com/DgA2MMsy");
-			buildHashMap.put("Cursebot", tuple5);
-			Tuple<String, String> tuple6 = new Tuple<String, String>(
-					"https://www.pathofexile.com/forum/view-thread/1893911", "https://pastebin.com/BT6G6KNE");
-			buildHashMap.put("Ultrabot", tuple6);
-			Tuple<String, String> tuple7 = new Tuple<String, String>(
-					"https://www.pathofexile.com/forum/view-thread/1730745", "https://pastebin.com/jm9NBFJ4");
-			buildHashMap.put("Pizza-Sticks", tuple7);
-			Tuple<String, String> tuple8 = new Tuple<String, String>(
-					"https://www.pathofexile.com/forum/view-thread/2119881", "https://pastebin.com/RXWzDTLF");
-			buildHashMap.put("Reave Champion", tuple8);
-			Tuple<String, String> tuple9 = new Tuple<String, String>(
-					"https://www.pathofexile.com/forum/view-thread/1846362", "https://pastebin.com/e5etK9i6");
-			buildHashMap.put("Mjölner Discharge", tuple9);
-			Tuple<String, String> tuple10 = new Tuple<String, String>(
-					"https://www.pathofexile.com/forum/view-thread/2050819", "https://pastebin.com/MrC3xH2d");
-			buildHashMap.put("The Poet's Pen Volatile Dead", tuple10);
-
-			PoeBuildChooser.globalBuildArray.buildHashMap = buildHashMap;
-			PoeBuildChooser.globalBuildArray.anzahlBuilds();
+			PoeBuildChooser.globalBuildArray.buildArray = new ArrayList<Build>();
+			makeStandardArray();
+			PoeBuildChooser.globalBuildArray.buildAnzahl = PoeBuildChooser.globalBuildArray.anzahlBuilds();
 			deleteFile(PoeBuildChooser.buildDateiId);
 			// TODO .csv Datei durch Datenbank ersetzen
-			speichern(buildHashMap, new File(files.get(PoeBuildChooser.buildDateiId - 1).toString()));
+			speichern(PoeBuildChooser.globalBuildArray.buildArray,
+					new File(files.get(PoeBuildChooser.buildDateiId - 1).toString()));
 			System.out.println(
 					"Build Datei wurde erstellt und mit einigen Builds initialisiert." + " Die Build Datei wurde unter "
 							+ files.get(PoeBuildChooser.buildDateiId - 1).toString() + " gespeichert.");
@@ -128,39 +94,9 @@ public class BuildDatei {
 	public void initializeBuildDatei() throws IOException {
 		// TODO soll später, durch eine extra Funktion übernommen werden, die hier dann
 		// einfach aufgerufen wird. Ebenso bei resetBuildDatei (Codeminimierung)
-		Tuple<String, String> tuple1 = new Tuple<String, String>(
-				"https://www.pathofexile.com/forum/view-thread/1827487", "https://pastebin.com/QS1VB9Vp");
-		PoeBuildChooser.globalBuildArray.buildHashMap.put("Golemancer", tuple1);
-		Tuple<String, String> tuple2 = new Tuple<String, String>(
-				"https://www.pathofexile.com/forum/view-thread/2074126", "https://pastebin.com/Zm5JqGFs");
-		PoeBuildChooser.globalBuildArray.buildHashMap.put("Kintetic Blast", tuple2);
-		Tuple<String, String> tuple3 = new Tuple<String, String>(
-				"https://www.pathofexile.com/forum/view-thread/1971585", "https://pastebin.com/iV5wMmVV");
-		PoeBuildChooser.globalBuildArray.buildHashMap.put("Spectres", tuple3);
-		Tuple<String, String> tuple4 = new Tuple<String, String>(
-				"https://www.pathofexile.com/forum/view-thread/2093326",
-				"Es wurde zu diesem Build kein POB-Pastebin Link angegeben.");
-		PoeBuildChooser.globalBuildArray.buildHashMap.put("Aurabot", tuple4);
-		Tuple<String, String> tuple5 = new Tuple<String, String>(
-				"https://www.pathofexile.com/forum/view-thread/2059332", "https://pastebin.com/DgA2MMsy");
-		PoeBuildChooser.globalBuildArray.buildHashMap.put("Cursebot", tuple5);
-		Tuple<String, String> tuple6 = new Tuple<String, String>(
-				"https://www.pathofexile.com/forum/view-thread/1893911", "https://pastebin.com/BT6G6KNE");
-		PoeBuildChooser.globalBuildArray.buildHashMap.put("Ultrabot", tuple6);
-		Tuple<String, String> tuple7 = new Tuple<String, String>(
-				"https://www.pathofexile.com/forum/view-thread/1730745", "https://pastebin.com/jm9NBFJ4");
-		PoeBuildChooser.globalBuildArray.buildHashMap.put("Pizza-Sticks", tuple7);
-		Tuple<String, String> tuple8 = new Tuple<String, String>(
-				"https://www.pathofexile.com/forum/view-thread/2119881", "https://pastebin.com/RXWzDTLF");
-		PoeBuildChooser.globalBuildArray.buildHashMap.put("Reave Champion", tuple8);
-		Tuple<String, String> tuple9 = new Tuple<String, String>(
-				"https://www.pathofexile.com/forum/view-thread/1846362", "https://pastebin.com/e5etK9i6");
-		PoeBuildChooser.globalBuildArray.buildHashMap.put("Mjölner Discharge", tuple9);
-		Tuple<String, String> tuple10 = new Tuple<String, String>(
-				"https://www.pathofexile.com/forum/view-thread/2050819", "https://pastebin.com/MrC3xH2d");
-		PoeBuildChooser.globalBuildArray.buildHashMap.put("The Poet's Pen Volatile Dead", tuple10);
+		makeStandardArray();
 		PoeBuildChooser.globalBuildArray.anzahlBuilds();
-		speichern(PoeBuildChooser.globalBuildArray.buildHashMap, new File("Default - POEBuildChooserBuilds.csv"));
+		speichern(PoeBuildChooser.globalBuildArray.buildArray, new File("Default - POEBuildChooserBuilds.csv"));
 		System.out.println("Build Datei wurde erstellt und mit einigen Builds initialisiert. "
 				+ "Die Build Datei wurde unter New File - POEBuildChooserBuilds.csv gespeichert.");
 	}
@@ -194,8 +130,7 @@ public class BuildDatei {
 					System.out.println(String.valueOf(counter) + ": " + files.get(i));
 				}
 				boolean chooseFile = true;
-				while (chooseFile) {
-					boolean keineZahlEingegeben = false;
+				mainWhileLoop: while (chooseFile) {
 					System.out.println(
 							"Nummer der zu ladenen Datei eingeben ('0' Eingeben um eine neue Datei zu erzeugen):");
 					String input = in.readLine();
@@ -204,31 +139,26 @@ public class BuildDatei {
 						if (!Character.isDigit(c)) {
 							System.out
 									.println("Bitte nur Zahlen eingeben, keine Buchstaben, Leer- oder Sonderzeichen.");
-							keineZahlEingegeben = true;
-							break;
+							continue mainWhileLoop;
 						} else {
 							continue;
 						}
 					}
-					if (keineZahlEingegeben) {
-						continue;
-					} else if (antwort == 0) {
+					antwort = Integer.parseInt(input);
+
+					if (antwort == 0) {
 						// TODO als extra Funktion die erstellung einer Build-Datei anbieten, nicht
 						// unter dieser Funktion
 						System.out.println("Bitte einen Namen für die Datei eingeben:");
-						String buildName = in.readLine();
-						HashMap<String, Tuple<String, String>> buildHashMap = new HashMap<String, Tuple<String, String>>();
-						PoeBuildChooser.globalBuildArray.buildHashMap = buildHashMap;
-						PoeBuildChooser.globalBuildArray.anzahlBuilds();
-						speichern(PoeBuildChooser.globalBuildArray.buildHashMap,
-								new File(buildName + " - POEBuildChooserBuilds.csv"));
+						String fileName = in.readLine();
+						PoeBuildChooser.globalBuildArray.buildAnzahl = PoeBuildChooser.globalBuildArray.anzahlBuilds();
+						speichern(PoeBuildChooser.globalBuildArray.buildArray,
+								new File(fileName + " - POEBuildChooserBuilds.csv"));
 						System.out.println(
 								"Build Datei wurde erstellt und mit einigen Builds initialisiert. Die Build Datei wurde als "
-										+ buildName + " - POEBuildChooserBuilds.csv gespeichert.");
-
+										+ fileName + " - POEBuildChooserBuilds.csv gespeichert.");
 						return;
 					} else {
-						antwort = Integer.parseInt(input);
 						readFiles(antwort);
 					}
 
@@ -242,7 +172,7 @@ public class BuildDatei {
 			} else if (anzahlFiles == 0) {
 				System.out.println(
 						"Es wurden keine Gültigen Build Dateien gefunden. Es wird eine neue Build Datei erzeugt und geladen.");
-				createFile();
+				initializeBuildDatei();
 			} else {
 				readFiles(1);
 			}
@@ -256,42 +186,33 @@ public class BuildDatei {
 	}
 
 	/**
-	 * Speichert die aktuelle Map in der Datei ab. Später, wenn korrekt mit
-	 * mehreren Dateien umgegangen werden kann, wird die Map in der aktuell
-	 * gewählten Datei gespeichert.
+	 * Speichert die aktuelle Map in der Datei ab. Später, wenn korrekt mit mehreren
+	 * Dateien umgegangen werden kann, wird die Map in der aktuell gewählten Datei
+	 * gespeichert.
 	 * 
 	 * @param buildHashMap
 	 * @param datei
 	 * @throws IOException
 	 */
-	public void speichern(HashMap<String, Tuple<String, String>> buildHashMap, File datei) throws IOException {
+	public void speichern(ArrayList<Build> buildArray, File datei) throws IOException {
 		// TODO Für den Umgang mit mehreren Dateien sollte hier noch hinzugefügt werden
 		// das der Nutzer eine Datei wählen kann in der er speichern möchte.
-		TreeMap<String, Tuple<String, String>> sortedBuildHashMap = (TreeMap<String, Tuple<String, String>>) PoeBuildChooser.globalBuildArray
-				.sortMapByKey(buildHashMap);
 		PrintWriter printWriter = new PrintWriter(new FileWriter(datei));
-		Tuple<String, String> forIteration = new Tuple<String, String>("", "");
 		StringBuilder sb = new StringBuilder();
-		Set<String> keys = sortedBuildHashMap.keySet();
 		String saveBuildName;
 		String saveForumURL;
 		String savePOBURL;
 
-		for (String key : keys) {
-			saveBuildName = key;
-			forIteration = buildHashMap.get(key);
-			saveForumURL = forIteration.getX();
-			savePOBURL = forIteration.getY();
+		for (Build build : buildArray) {
+			saveBuildName = build.getBuildName();
+			saveForumURL = build.getForumLink();
+			savePOBURL = build.getPobLink();
 			sb.append(saveBuildName);
-			// System.out.println(sb);
 			sb.append(',');
 			sb.append(saveForumURL);
-			// System.out.println(sb);
 			sb.append(',');
 			sb.append(savePOBURL);
-			// System.out.println(sb);
 			sb.append('\n');
-			// System.out.println(sb);
 			printWriter.write(sb.toString());
 			sb.delete(0, sb.length());
 		}
@@ -331,9 +252,11 @@ public class BuildDatei {
 		Boolean contains = zuTesten.endsWith(" - POEBuildChooserBuilds.csv");
 		return contains;
 	}
-	
+
 	/**
-	 * Liest die Dateien ein, teilt die Einträge auf und füllt damit die Tupel und die Map.
+	 * Liest die Dateien ein, teilt die Einträge auf und füllt damit die Tupel und
+	 * die Map.
+	 * 
 	 * @param fileNumber
 	 * @throws IOException
 	 */
@@ -359,15 +282,14 @@ public class BuildDatei {
 				build = parts[0];
 				forum = parts[1];
 				pob = parts[2];
-				Tuple<String, String> tupleread = new Tuple<String, String>(forum, pob);
-				PoeBuildChooser.globalBuildArray.buildHashMap.put(build, tupleread);
+				PoeBuildChooser.globalBuildArray.buildArray.add(new Build(build, forum, pob));
 				line = buildDatei.readLine();
 			}
 			buildDatei.close();
-			buildAnzahl = PoeBuildChooser.globalBuildArray.anzahlBuilds();
+			PoeBuildChooser.globalBuildArray.buildAnzahl = PoeBuildChooser.globalBuildArray.anzahlBuilds();
 			System.out.println("");
-			System.out.println(
-					"Es wurden " + buildAnzahl + " Builds aus der Build Datei: " + gewaehlteDatei + " geladen");
+			System.out.println("Es wurden " + PoeBuildChooser.globalBuildArray.buildAnzahl
+					+ " Builds aus der Build Datei: " + gewaehlteDatei + " geladen");
 		}
 		PoeBuildChooser.buildDateiId = fileNumber;
 	}
@@ -396,5 +318,42 @@ public class BuildDatei {
 	public String currentDirectory() {
 		Path currentRelativePath = Paths.get("");
 		return currentRelativePath.toAbsolutePath().toString();
+	}
+
+	/**
+	 * Funktion um das Array mit einigen Standard Build Objekten zu füllen, für
+	 * verschiedene Zwecke. Die Build Objekte werden zu dem Array hinzugefügt.
+	 */
+	public void makeStandardArray() {
+		PoeBuildChooser.globalBuildArray.buildArray.add(new Build("Golemancer",
+				"https://www.pathofexile.com/forum/view-thread/1827487", "https://pastebin.com/QS1VB9Vp"));
+
+		PoeBuildChooser.globalBuildArray.buildArray.add(new Build("Kintetic Blast",
+				"https://www.pathofexile.com/forum/view-thread/2074126", "https://pastebin.com/Zm5JqGFs"));
+
+		PoeBuildChooser.globalBuildArray.buildArray.add(new Build("Spectres",
+				"https://www.pathofexile.com/forum/view-thread/1971585", "https://pastebin.com/iV5wMmVV"));
+
+		PoeBuildChooser.globalBuildArray.buildArray
+				.add(new Build("Aurabot", "https://www.pathofexile.com/forum/view-thread/2093326",
+						"Es wurde zu diesem Build kein POB-Pastebin Link angegeben."));
+
+		PoeBuildChooser.globalBuildArray.buildArray.add(new Build("Cursebot",
+				"https://www.pathofexile.com/forum/view-thread/2059332", "https://pastebin.com/DgA2MMsy"));
+
+		PoeBuildChooser.globalBuildArray.buildArray.add(new Build("Ultrabot",
+				"https://www.pathofexile.com/forum/view-thread/1893911", "https://pastebin.com/BT6G6KNE"));
+
+		PoeBuildChooser.globalBuildArray.buildArray.add(new Build("Pizza-Sticks",
+				"https://www.pathofexile.com/forum/view-thread/1730745", "https://pastebin.com/jm9NBFJ4"));
+
+		PoeBuildChooser.globalBuildArray.buildArray.add(new Build("Reave Champion",
+				"https://www.pathofexile.com/forum/view-thread/2119881", "https://pastebin.com/RXWzDTLF"));
+
+		PoeBuildChooser.globalBuildArray.buildArray.add(new Build("Mjölner Discharge",
+				"https://www.pathofexile.com/forum/view-thread/1846362", "https://pastebin.com/e5etK9i6"));
+
+		PoeBuildChooser.globalBuildArray.buildArray.add(new Build("The Poet's Pen Volatile Dead",
+				"https://www.pathofexile.com/forum/view-thread/2050819", "https://pastebin.com/MrC3xH2d"));
 	}
 }

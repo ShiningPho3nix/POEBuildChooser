@@ -3,12 +3,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * 
@@ -20,11 +14,11 @@ import java.util.TreeMap;
  */
 public class BuildArray {
 
-	public int buildAnzahl;
-	public boolean initialize;
-	BufferedReader in;
-	String initializeAnswere;
-	public HashMap<String, Tuple<String, String>> buildHashMap;
+	int buildAnzahl;
+	private boolean initialize;
+	private BufferedReader in;
+	private String initializeAnswere;
+	public ArrayList<Build> buildArray;
 
 	/**
 	 * Inizialisiert einige Werte.
@@ -33,7 +27,7 @@ public class BuildArray {
 		buildAnzahl = 0;
 		initialize = true;
 		initializeAnswere = null;
-		buildHashMap = new HashMap<String, Tuple<String, String>>();
+		buildArray = new ArrayList<Build>();
 	}
 
 	/**
@@ -81,25 +75,25 @@ public class BuildArray {
 	 * @throws IOException
 	 */
 	public void addBuild() throws IOException {
-		String inputBuildName;
-		String inputBuildURL;
-		String inputPOBURL;
+		String inputBuildName = "";
+		String inputForumURL = "";
+		String inputPOBURL = "";
 		Boolean tryAgain = true;
 		Boolean anotherOne = true;
 		Boolean exists = false;
 		Boolean continueAnotherOne = false;
+		ArrayList<Build> localBuildArray = new ArrayList<Build>();
 
 		while (anotherOne) {
+			localBuildArray = PoeBuildChooser.globalBuildArray.buildArray;
 			in = new BufferedReader(new InputStreamReader(System.in));
 			System.out.println("Build Namen eingeben:");
 			inputBuildName = in.readLine();
 
 			if (inputBuildName != null && !inputBuildName.contains(",") && !inputBuildName.equals("")) {
-				Collection<String> buildCollection = PoeBuildChooser.globalBuildArray.buildHashMap.keySet();
-				List<String> buildList = new ArrayList<>(buildCollection);
 
-				for (Iterator<String> iterator = buildList.iterator(); iterator.hasNext();) {
-					String string = iterator.next();
+				for (Build build : localBuildArray) {
+					String string = build.getBuildName();
 
 					if (string.equals(inputBuildName)) {
 						exists = true;
@@ -140,21 +134,19 @@ public class BuildArray {
 				if (continueAnotherOne) {
 					continue;
 				}
-				Tuple<String, String> tuple = new Tuple<String, String>(null, null);
 				System.out.println("Optional: Forums Link zum Build angeben (überspringen mit Enter):");
 				tryAgain = true;
 				while (tryAgain) {
-					inputBuildURL = in.readLine();
+					inputForumURL = in.readLine();
 
-					if (inputBuildURL.equals("")) {
+					if (inputForumURL.equals("")) {
 						tryAgain = false;
-						tuple.setX("Es wurde zu diesem Build kein Forums Link angegeben.");
+						inputForumURL = "Es wurde zu diesem Build kein Forums Link angegeben.";
 						continue;
 
-					} else if (inputBuildURL.contains("pathofexile.com/forum")) {
+					} else if (inputForumURL.contains("pathofexile.com/forum")) {
 						tryAgain = false;
-						System.out.println(inputBuildURL + " wird als Forums Link dem Build zugeordnet.");
-						tuple.setX(inputBuildURL);
+						System.out.println(inputForumURL + " wird als Forums Link dem Build zugeordnet.");
 
 					} else if (in.toString().toUpperCase().equals("CANCEL")) {
 						return;
@@ -173,13 +165,12 @@ public class BuildArray {
 
 					if (inputPOBURL.equals("")) {
 						tryAgain = false;
-						tuple.setY("Es wurde zu diesem Build kein POB-Pastebin Link angegeben.");
+						inputPOBURL = "Es wurde zu diesem Build kein POB-Pastebin Link angegeben.";
 						continue;
 
 					} else if (inputPOBURL.contains("pastebin.com")) {
 						tryAgain = false;
 						System.out.println(inputPOBURL + " wird als POB-Pastebin Link dem Build zugeordnet.");
-						tuple.setY(inputPOBURL);
 
 					} else if (in.toString().toUpperCase().equals("CANCEL")) {
 						return;
@@ -189,9 +180,9 @@ public class BuildArray {
 						continue;
 					}
 				}
-				buildHashMap.put(inputBuildName, tuple);
-				buildAnzahl = anzahlBuilds();
-				PoeBuildChooser.globalBuildDatei.speichern(buildHashMap,
+				localBuildArray.add(new Build(inputBuildName, inputForumURL, inputPOBURL));
+				PoeBuildChooser.globalBuildArray.buildAnzahl = anzahlBuilds();
+				PoeBuildChooser.globalBuildDatei.speichern(buildArray,
 						new File(BuildDatei.files.get(PoeBuildChooser.buildDateiId - 1).toString()));
 			} else if (in.toString().toUpperCase().equals("CANCEL")) {
 				return;
@@ -234,20 +225,30 @@ public class BuildArray {
 
 		while (unclear) {
 			System.out.println("Zu löschenden Buildnamen eingeben:");
-			String buildName = in.readLine();
+			String buildNameToTest = in.readLine();
 			Boolean buildExists = false;
+			Build buildToDelete = new Build("", "", "");
 
-			if (buildName.equals("") || buildName.equals(null)) {
+			if (buildNameToTest.equals("") || buildNameToTest.equals(null)) {
 				System.out.println("Eingabe darf nicht leer sein");
 				continue;
 			}
 
-			buildExists = PoeBuildChooser.globalBuildArray.buildHashMap.containsKey(buildName);
+			for (Build build : PoeBuildChooser.globalBuildArray.buildArray) {
+				String buildNameFromArray = build.getBuildName();
+				if (buildNameFromArray.equals(buildNameToTest)) {
+					buildExists = true;
+					buildToDelete = build;
+					break;
+				}
+
+			}
+
 			if (buildExists) {
-				PoeBuildChooser.globalBuildArray.buildHashMap.remove(buildName);
-				PoeBuildChooser.globalBuildDatei.speichern(buildHashMap,
+				PoeBuildChooser.globalBuildArray.buildArray.remove(buildToDelete);
+				PoeBuildChooser.globalBuildDatei.speichern(buildArray,
 						new File(BuildDatei.files.get(PoeBuildChooser.buildDateiId - 1).toString()));
-				System.out.println("Löschen des Builds " + buildName + " war erfolgreich");
+				System.out.println("Löschen des Builds " + buildNameToTest + " war erfolgreich");
 				unclear = false;
 				break;
 			} else {
@@ -288,15 +289,12 @@ public class BuildArray {
 	 * Build-Dateien.
 	 */
 	private String createContinuousName(String inputBuildName) {
-
-		Collection<String> buildCollection = PoeBuildChooser.globalBuildArray.buildHashMap.keySet();
-		List<String> buildList = new ArrayList<>(buildCollection);
 		String buildName = inputBuildName;
 		String originalBuildName = inputBuildName;
 		int i = 1;
 
-		for (Iterator<String> iterator = buildList.iterator(); iterator.hasNext();) {
-			String string = iterator.next();
+		for (Build build : PoeBuildChooser.globalBuildArray.buildArray) {
+			String string = build.getBuildName();
 
 			if (string.equals(buildName)) {
 				buildName = originalBuildName + i;
@@ -312,28 +310,12 @@ public class BuildArray {
 	 * Konsole aus.
 	 */
 	public void list() {
-		TreeMap<String, Tuple<String, String>> sortedBuildHashMap = (TreeMap<String, Tuple<String, String>>) PoeBuildChooser.globalBuildArray
-				.sortMapByKey(buildHashMap);
-		Collection<String> buildCollection = sortedBuildHashMap.keySet();
-		List<String> buildList = new ArrayList<>(buildCollection);
 		System.out.println("Die derzeitigen Builds sind:");
-		for (Iterator<String> iterator = buildList.iterator(); iterator.hasNext();) {
-			String string = iterator.next();
+		for (Build build : PoeBuildChooser.globalBuildArray.buildArray) {
+			String string = build.getBuildName();
 			System.out.println(string);
 		}
 		System.out.println("");
-	}
-
-	/**
-	 * Sortiert die Builds alphabetisch.
-	 * 
-	 * @param aItems
-	 * @return Gibt eine alphabetisch sortierte Map zurück.
-	 */
-	public Map<String, Tuple<String, String>> sortMapByKey(Map<String, Tuple<String, String>> aItems) {
-		TreeMap<String, Tuple<String, String>> result = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-		result.putAll(aItems);
-		return result;
 	}
 
 	/**
@@ -342,38 +324,8 @@ public class BuildArray {
 	 * @return Gibt die Anzahl an Builds zurück
 	 */
 	public int anzahlBuilds() {
-		buildAnzahl = buildHashMap.size();
+		buildAnzahl = buildArray.size();
 		return buildAnzahl;
-	}
-
-	/**
-	 * @param buildname
-	 * @return Gibt den ersten Wert im Tupel zurück, was immer der Forums Link sein
-	 *         solte.
-	 */
-	public String getForumsLink(String buildname) {
-		return buildHashMap.get(buildname).getX();
-	}
-
-	/**
-	 * @param buildname
-	 * @return Gibt den zweiten Wert im Tupel zurück, was immer der POB Link sein
-	 *         sollte.
-	 */
-	public String getPOBLink(String buildname) {
-		return buildHashMap.get(buildname).getY();
-	}
-
-	/**
-	 * Funktion fügt der HashMap einen Build mitsamt Forums-Link und PoB-Link hinzu.
-	 * 
-	 * @param buildname
-	 * @param forum
-	 * @param pob
-	 */
-	public void putBuild(String buildname, String forum, String pob) {
-		Tuple<String, String> tuple = new Tuple<String, String>(forum, pob);
-		buildHashMap.put(buildname, tuple);
 	}
 
 }
